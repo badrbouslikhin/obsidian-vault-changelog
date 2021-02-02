@@ -11,6 +11,7 @@ export default class Changelog extends Plugin {
     this.setting = (await this.loadData()) || {
       numberOfFilesToShow: 10,
       changelogFilePath: "",
+      watchVaultChange: false,
     };
 
     this.addSettingTab(new ChangelogSettingsTab(this.app, this));
@@ -22,18 +23,25 @@ export default class Changelog extends Plugin {
       hotkeys: [],
     });
 
-    this.registerEvent(
-      this.app.vault.on("create", (file) => this.watchVaultChange(file))
-    );
-    this.registerEvent(
-      this.app.vault.on("modify", (file) => this.watchVaultChange(file))
-    );
-    this.registerEvent(
-      this.app.vault.on("delete", (file) => this.watchVaultChange(file))
-    );
-    this.registerEvent(
-      this.app.vault.on("rename", (file) => this.watchVaultChange(file))
-    );
+    this.registerWatchVaultEvents();
+  }
+
+  registerWatchVaultEvents() {
+    if (this.setting.watchVaultChange) {
+      console.log("Registering events");
+      this.registerEvent(
+        this.app.vault.on("create", (file) => this.watchVaultChange(file))
+      );
+      this.registerEvent(
+        this.app.vault.on("modify", (file) => this.watchVaultChange(file))
+      );
+      this.registerEvent(
+        this.app.vault.on("delete", (file) => this.watchVaultChange(file))
+      );
+      this.registerEvent(
+        this.app.vault.on("rename", (file) => this.watchVaultChange(file))
+      );
+    }
   }
 
   watchVaultChange(file: any) {
@@ -83,6 +91,7 @@ export default class Changelog extends Plugin {
 interface ChangelogSettings {
   changelogFilePath: string;
   numberOfFilesToShow: number;
+  watchVaultChange: boolean;
 }
 
 class ChangelogSettingsTab extends PluginSettingTab {
@@ -124,6 +133,21 @@ class ChangelogSettingsTab extends PluginSettingTab {
               settings.numberOfFilesToShow = Number(value);
               this.plugin.saveData(settings);
             }
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("Write changelog on vault change")
+      .setDesc(
+        "Update changelog on any vault change (create, modify, rename or delete a note)"
+      )
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.setting.watchVaultChange)
+          .onChange((value) => {
+            this.plugin.setting.watchVaultChange = value;
+            this.plugin.saveData(settings);
+            this.plugin.registerWatchVaultEvents();
           })
       );
   }
