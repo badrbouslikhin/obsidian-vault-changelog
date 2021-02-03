@@ -18,8 +18,8 @@ export default class Changelog extends Plugin {
     this.addSettingTab(new ChangelogSettingsTab(this.app, this));
 
     this.addCommand({
-      id: "write-changelog-to-current-note",
-      name: "Write changelog to current note",
+      id: "update-changelog",
+      name: "Update changelog",
       callback: () => this.writeChangelog(),
       hotkeys: [],
     });
@@ -120,7 +120,7 @@ class ChangelogSettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Changelog file location")
-      .setDesc("Changelog file absolute path")
+      .setDesc("Changelog file absolute path (including the extension)")
       .addText((text) => {
         text
           .setPlaceholder("Example: Folder/Changelog.md")
