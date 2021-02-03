@@ -1,18 +1,19 @@
 import { App, Plugin, PluginSettingTab, Setting, TFile } from "obsidian";
 import dayjs from "dayjs";
 
+const DEFAULT_SETTINGS: ChangelogSettings = {
+  numberOfFilesToShow: 10,
+  changelogFilePath: "",
+  watchVaultChange: false,
+};
+
 export default class Changelog extends Plugin {
-  setting: ChangelogSettings;
-  onInit() {}
+  settings: ChangelogSettings;
 
   async onload() {
     console.log("Loading Changelog plugin");
 
-    this.setting = (await this.loadData()) || {
-      numberOfFilesToShow: 10,
-      changelogFilePath: "",
-      watchVaultChange: false,
-    };
+    this.loadSettings();
 
     this.addSettingTab(new ChangelogSettingsTab(this.app, this));
 
@@ -27,7 +28,7 @@ export default class Changelog extends Plugin {
   }
 
   registerWatchVaultEvents() {
-    if (this.setting.watchVaultChange) {
+    if (this.settings.watchVaultChange) {
       console.log("Registering events");
       this.registerEvent(
         this.app.vault.on("create", (file) => this.watchVaultChange(file))
@@ -45,7 +46,7 @@ export default class Changelog extends Plugin {
   }
 
   watchVaultChange(file: any) {
-    if (file.path == this.setting.changelogFilePath) {
+    if (file.path == this.settings.changelogFilePath) {
       return;
     } else {
       this.writeChangelog();
@@ -54,17 +55,17 @@ export default class Changelog extends Plugin {
 
   writeChangelog() {
     const changelog = this.buildChangelog();
-    this.writeInFile(this.setting.changelogFilePath, changelog);
+    this.writeInFile(this.settings.changelogFilePath, changelog);
   }
 
   buildChangelog(): string {
     const files = this.app.vault.getMarkdownFiles();
     const recentlyEditedFiles = files
       .sort((a, b) => (a.stat.mtime < b.stat.mtime ? 1 : -1))
-      .slice(0, this.setting.numberOfFilesToShow);
+      .slice(0, this.settings.numberOfFilesToShow);
     let changelogContent = ``;
     for (let recentlyEditedFile of recentlyEditedFiles) {
-      if (recentlyEditedFile.path == this.setting.changelogFilePath) {
+      if (recentlyEditedFile.path == this.settings.changelogFilePath) {
         continue;
       } else {
         // TODO: make date format configurable (and validate it)
@@ -81,6 +82,14 @@ export default class Changelog extends Plugin {
     const file = this.app.vault.getAbstractFileByPath(filePath) as TFile;
     // TODO: handle errors
     this.app.vault.modify(file, content);
+  }
+
+  loadSettings() {
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, this.loadData());
+  }
+
+  saveSettings() {
+    this.saveData(this.settings);
   }
 
   onunload() {
@@ -107,7 +116,7 @@ class ChangelogSettingsTab extends PluginSettingTab {
 
     containerEl.empty();
 
-    const settings = this.plugin.setting;
+    const settings = this.plugin.settings;
 
     new Setting(containerEl)
       .setName("Changelog file location")
@@ -118,7 +127,7 @@ class ChangelogSettingsTab extends PluginSettingTab {
           .setValue(settings.changelogFilePath)
           .onChange((value) => {
             settings.changelogFilePath = String(value);
-            this.plugin.saveData(settings);
+            this.plugin.saveSettings();
           });
       });
 
@@ -131,7 +140,7 @@ class ChangelogSettingsTab extends PluginSettingTab {
           .onChange((value) => {
             if (!isNaN(Number(value))) {
               settings.numberOfFilesToShow = Number(value);
-              this.plugin.saveData(settings);
+              this.plugin.saveSettings();
             }
           })
       );
@@ -143,10 +152,10 @@ class ChangelogSettingsTab extends PluginSettingTab {
       )
       .addToggle((toggle) =>
         toggle
-          .setValue(this.plugin.setting.watchVaultChange)
+          .setValue(this.plugin.settings.watchVaultChange)
           .onChange((value) => {
-            this.plugin.setting.watchVaultChange = value;
-            this.plugin.saveData(settings);
+            this.plugin.settings.watchVaultChange = value;
+            this.plugin.saveSettings();
             this.plugin.registerWatchVaultEvents();
           })
       );
