@@ -70,7 +70,7 @@ export default class Changelog extends Plugin {
       } else {
         // TODO: make date format configurable (and validate it)
         const humanTime = dayjs(recentlyEditedFile.stat.mtime).format(
-          "YYYY-MM-DD [at] H[h]m"
+          "YYYY-MM-DD [at] HH[h]mm"
         );
         changelogContent += `- ${humanTime} · [[${recentlyEditedFile.basename}]]\n`;
       }
