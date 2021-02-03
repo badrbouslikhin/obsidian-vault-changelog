@@ -10,7 +10,7 @@ const DEFAULT_SETTINGS: ChangelogSettings = {
 export default class Changelog extends Plugin {
   settings: ChangelogSettings;
 
-  async onload() {
+  onload() {
     console.log("Loading Changelog plugin");
 
     this.loadSettings();
