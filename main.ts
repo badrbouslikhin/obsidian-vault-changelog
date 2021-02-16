@@ -10,10 +10,10 @@ const DEFAULT_SETTINGS: ChangelogSettings = {
 export default class Changelog extends Plugin {
   settings: ChangelogSettings;
 
-  onload() {
+  async onload() {
     console.log("Loading Changelog plugin");
 
-    this.loadSettings();
+    await this.loadSettings();
 
     this.addSettingTab(new ChangelogSettingsTab(this.app, this));
 
@@ -24,10 +24,10 @@ export default class Changelog extends Plugin {
       hotkeys: [],
     });
 
-    this.registerWatchVaultEvents();
+    await this.registerWatchVaultEvents();
   }
 
-  registerWatchVaultEvents() {
+  async registerWatchVaultEvents() {
     if (this.settings.watchVaultChange) {
       console.log("Registering events");
       this.registerEvent(
@@ -45,17 +45,17 @@ export default class Changelog extends Plugin {
     }
   }
 
-  watchVaultChange(file: any) {
+  async watchVaultChange(file: any) {
     if (file.path == this.settings.changelogFilePath) {
       return;
     } else {
-      this.writeChangelog();
+      await this.writeChangelog();
     }
   }
 
-  writeChangelog() {
+  async writeChangelog() {
     const changelog = this.buildChangelog();
-    this.writeInFile(this.settings.changelogFilePath, changelog);
+    await this.writeInFile(this.settings.changelogFilePath, changelog);
   }
 
   buildChangelog(): string {
@@ -78,18 +78,18 @@ export default class Changelog extends Plugin {
     return changelogContent;
   }
 
-  writeInFile(filePath: string, content: string) {
+  async writeInFile(filePath: string, content: string) {
     const file = this.app.vault.getAbstractFileByPath(filePath) as TFile;
     // TODO: handle errors
-    this.app.vault.modify(file, content);
+    await this.app.vault.modify(file, content);
   }
 
-  loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, this.loadData());
+  async loadSettings() {
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
   }
 
-  saveSettings() {
-    this.saveData(this.settings);
+  async saveSettings() {
+    await this.saveData(this.settings);
   }
 
   onunload() {
