@@ -18,8 +18,8 @@ export default class Changelog extends Plugin {
     this.addSettingTab(new ChangelogSettingsTab(this.app, this));
 
     this.addCommand({
-      id: "update-changelog",
-      name: "Update changelog",
+      id: "update",
+      name: "update",
       callback: () => this.writeChangelog(),
       hotkeys: [],
     });
@@ -125,7 +125,7 @@ class ChangelogSettingsTab extends PluginSettingTab {
     const settings = this.plugin.settings;
 
     new Setting(containerEl)
-      .setName("Changelog file location")
+      .setName("Changelog note location")
       .setDesc("Changelog file absolute path (including the extension)")
       .addText((text) => {
         text
@@ -138,7 +138,7 @@ class ChangelogSettingsTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName("Number of recent files")
+      .setName("Number of recent files in changelog")
       .setDesc("Number of most recently edited files to show in the changelog")
       .addText((text) =>
         text
@@ -152,9 +152,9 @@ class ChangelogSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Write changelog on vault change")
+      .setName("Automatically update changelog")
       .setDesc(
-        "Update changelog on any vault change (create, modify, rename or delete a note)"
+        "Automatically update changelog on any vault change (modification, renaming or deletion of a note)"
       )
       .addToggle((toggle) =>
         toggle
