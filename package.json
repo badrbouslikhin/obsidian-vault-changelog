@@ -1,6 +1,6 @@
 {
   "name": "obsidian-vault-changelog",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Obsidian plugin to maintain a notes changelog in a vault",
   "main": "main.js",
   "scripts": {
