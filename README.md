@@ -1,9 +1,13 @@
 # Obsidian Vault Changelog Plugin
 
-This is a simple plugin that maintains a changelog of recently edited files in your vault.  
+This is a simple plugin that maintains a changelog of recently edited files in your vault.
 The changelog update can be triggered both manually and automatically.
 
-![Changelog example](resources/demo.png)
+<img src="https://raw.githubusercontent.com/MrZeroo00/obsidian-vault-changelog/main/resources/demo.png" width=50% height=50%>
+
+**Everything in the changelog note will be overwritten**. It's best to use a dedicated changelog note and embed it in other notes.
+
+<img src="https://raw.githubusercontent.com/MrZeroo00/obsidian-vault-changelog/main/resources/demo-embedded.png" width=50% height=50%>
 
 ## How to Install
 
