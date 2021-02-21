@@ -67,19 +67,20 @@ export default class Changelog extends Plugin {
   buildChangelog(): string {
     const files = this.app.vault.getMarkdownFiles();
     const recentlyEditedFiles = files
+      // Remove changelog file from recentlyEditedFiles list
+      .filter(
+        (recentlyEditedFile) =>
+          recentlyEditedFile.path != this.settings.changelogFilePath
+      )
       .sort((a, b) => (a.stat.mtime < b.stat.mtime ? 1 : -1))
       .slice(0, this.settings.numberOfFilesToShow);
     let changelogContent = ``;
     for (let recentlyEditedFile of recentlyEditedFiles) {
-      if (recentlyEditedFile.path == this.settings.changelogFilePath) {
-        continue;
-      } else {
-        // TODO: make date format configurable (and validate it)
-        const humanTime = dayjs(recentlyEditedFile.stat.mtime).format(
-          "YYYY-MM-DD [at] HH[h]mm"
-        );
-        changelogContent += `- ${humanTime} · [[${recentlyEditedFile.basename}]]\n`;
-      }
+      // TODO: make date format configurable (and validate it)
+      const humanTime = dayjs(recentlyEditedFile.stat.mtime).format(
+        "YYYY-MM-DD [at] HH[h]mm"
+      );
+      changelogContent += `- ${humanTime} · [[${recentlyEditedFile.basename}]]\n`;
     }
     return changelogContent;
   }
