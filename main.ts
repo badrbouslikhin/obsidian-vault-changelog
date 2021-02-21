@@ -1,5 +1,4 @@
 import { App, Plugin, PluginSettingTab, Setting, TFile } from "obsidian";
-import dayjs from "dayjs";
 
 const DEFAULT_SETTINGS: ChangelogSettings = {
   numberOfFilesToShow: 10,
@@ -77,9 +76,10 @@ export default class Changelog extends Plugin {
     let changelogContent = ``;
     for (let recentlyEditedFile of recentlyEditedFiles) {
       // TODO: make date format configurable (and validate it)
-      const humanTime = dayjs(recentlyEditedFile.stat.mtime).format(
-        "YYYY-MM-DD [at] HH[h]mm"
-      );
+      const humanTime = window
+        // @ts-ignore this is a hack to enable Obsidian's window.moment usage (and avoid an external dependency)
+        .moment(recentlyEditedFile.stat.mtime)
+        .format("YYYY-MM-DD [at] HH[h]mm");
       changelogContent += `- ${humanTime} · [[${recentlyEditedFile.basename}]]\n`;
     }
     return changelogContent;
