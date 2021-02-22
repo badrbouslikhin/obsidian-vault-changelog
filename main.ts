@@ -1,10 +1,18 @@
 import { App, Plugin, PluginSettingTab, Setting, TFile } from "obsidian";
+import type moment from "moment";
 
 const DEFAULT_SETTINGS: ChangelogSettings = {
   numberOfFilesToShow: 10,
   changelogFilePath: "",
   watchVaultChange: false,
 };
+
+declare global {
+  interface Window {
+    app: App;
+    moment: typeof moment;
+  }
+}
 
 export default class Changelog extends Plugin {
   settings: ChangelogSettings;
@@ -77,7 +85,6 @@ export default class Changelog extends Plugin {
     for (let recentlyEditedFile of recentlyEditedFiles) {
       // TODO: make date format configurable (and validate it)
       const humanTime = window
-        // @ts-ignore this is a hack to enable Obsidian's window.moment usage (and avoid an external dependency)
         .moment(recentlyEditedFile.stat.mtime)
         .format("YYYY-MM-DD [at] HH[h]mm");
       changelogContent += `- ${humanTime} · [[${recentlyEditedFile.basename}]]\n`;
