@@ -31,30 +31,19 @@ export default class Changelog extends Plugin {
       hotkeys: [],
     });
 
-    await this.registerWatchVaultEvents();
+    this.watchVaultChange = this.watchVaultChange.bind(this);
+    this.registerWatchVaultEvents();
   }
 
-  async registerWatchVaultEvents() {
+  registerWatchVaultEvents() {
     if (this.settings.watchVaultChange) {
-      console.log("Registering events");
-      this.registerEvent(
-        this.app.vault.on(
-          "modify",
-          async (file) => await this.watchVaultChange(file)
-        )
-      );
-      this.registerEvent(
-        this.app.vault.on(
-          "delete",
-          async (file) => await this.watchVaultChange(file)
-        )
-      );
-      this.registerEvent(
-        this.app.vault.on(
-          "rename",
-          async (file) => await this.watchVaultChange(file)
-        )
-      );
+      this.registerEvent(this.app.vault.on("modify", this.watchVaultChange));
+      this.registerEvent(this.app.vault.on("delete", this.watchVaultChange));
+      this.registerEvent(this.app.vault.on("rename", this.watchVaultChange));
+    } else {
+      this.app.vault.off("modify", this.watchVaultChange);
+      this.app.vault.off("delete", this.watchVaultChange);
+      this.app.vault.off("rename", this.watchVaultChange);
     }
   }
 
