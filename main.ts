@@ -48,7 +48,7 @@ export default class Changelog extends Plugin {
   }
 
   async watchVaultChange(file: any) {
-    if (file.path == this.settings.changelogFilePath) {
+    if (file.path === this.settings.changelogFilePath) {
       return;
     } else {
       await this.writeChangelog();
@@ -66,7 +66,7 @@ export default class Changelog extends Plugin {
       // Remove changelog file from recentlyEditedFiles list
       .filter(
         (recentlyEditedFile) =>
-          recentlyEditedFile.path != this.settings.changelogFilePath
+          recentlyEditedFile.path !== this.settings.changelogFilePath
       )
       .sort((a, b) => (a.stat.mtime < b.stat.mtime ? 1 : -1))
       .slice(0, this.settings.numberOfFilesToShow);
