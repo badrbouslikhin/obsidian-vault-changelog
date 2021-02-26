@@ -4,6 +4,7 @@ import {
   Plugin,
   PluginSettingTab,
   Setting,
+  debounce,
   TFile,
 } from "obsidian";
 import type moment from "moment";
@@ -38,7 +39,11 @@ export default class Changelog extends Plugin {
       hotkeys: [],
     });
 
-    this.watchVaultChange = this.watchVaultChange.bind(this);
+    this.watchVaultChange = debounce(
+      this.watchVaultChange.bind(this),
+      200,
+      false
+    );
     this.registerWatchVaultEvents();
   }
 
@@ -54,11 +59,11 @@ export default class Changelog extends Plugin {
     }
   }
 
-  async watchVaultChange(file: any) {
+  watchVaultChange(file: any) {
     if (file.path === this.settings.changelogFilePath) {
       return;
     } else {
-      await this.writeChangelog();
+      this.writeChangelog();
     }
   }
 
