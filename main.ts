@@ -139,7 +139,7 @@ class ChangelogSettingsTab extends PluginSettingTab {
           .setPlaceholder("Example: Folder/Changelog.md")
           .setValue(settings.changelogFilePath)
           .onChange((value) => {
-            settings.changelogFilePath = String(value);
+            settings.changelogFilePath = value;
             this.plugin.saveSettings();
           });
       });
