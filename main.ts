@@ -1,4 +1,11 @@
-import { App, Plugin, PluginSettingTab, Setting, TFile } from "obsidian";
+import {
+  App,
+  Notice,
+  Plugin,
+  PluginSettingTab,
+  Setting,
+  TFile,
+} from "obsidian";
 import type moment from "moment";
 
 const DEFAULT_SETTINGS: ChangelogSettings = {
@@ -82,9 +89,12 @@ export default class Changelog extends Plugin {
   }
 
   async writeInFile(filePath: string, content: string) {
-    const file = this.app.vault.getAbstractFileByPath(filePath) as TFile;
-    // TODO: handle errors
-    await this.app.vault.modify(file, content);
+    const file = this.app.vault.getAbstractFileByPath(filePath);
+    if (file instanceof TFile) {
+      await this.app.vault.modify(file, content);
+    } else {
+      new Notice("Couldn't write changelog: check the file path");
+    }
   }
 
   async loadSettings() {
