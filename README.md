@@ -19,7 +19,7 @@ The changelog update can be triggered both manually and automatically.
 
 ### From within Obsidian
 
-This plugin will be added soon to the community [plugins list](https://github.com/obsidianmd/obsidian-releases/blob/master/community-plugins.json).
+You can install the plugin via the Community Plugins tab within Obsidian. Just search for "Changelog".
 
 ## How to use
 
