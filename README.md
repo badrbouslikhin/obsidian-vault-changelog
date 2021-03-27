@@ -69,3 +69,16 @@ tweaks, you can do the following:
 
 This is experimental and may have instability. It is possible that there are
 bugs which may delete data in the current note. Please make backups!
+
+## Common issues and solutions
+
+### Issue 1: Couldn`t write changelog: check the file path
+
+1. Create a new file, for example - `notes/misc/changelog`
+2. Go to **Settings -> Plugin Option -> Vault Changelog**
+2. Enter path in **Changelog note location - notes/misc/changelog.md**
+3. Restart Obsidian
+
+#### **Notes:**
+> - Make sure to keep a **_proper file path and a name_**, like the one I have used.
+> - If you are creating a new file with Obsidian, then **_don't put a (.md) extension_**. 
