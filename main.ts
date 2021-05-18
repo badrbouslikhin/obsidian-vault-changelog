@@ -13,6 +13,7 @@ const DEFAULT_SETTINGS: ChangelogSettings = {
   numberOfFilesToShow: 10,
   changelogFilePath: "",
   watchVaultChange: false,
+  excludePaths: "",
 };
 
 declare global {
@@ -73,12 +74,27 @@ export default class Changelog extends Plugin {
   }
 
   buildChangelog(): string {
+    const pathsToExclude = this.settings.excludePaths.split(',');
     const files = this.app.vault.getMarkdownFiles();
     const recentlyEditedFiles = files
       // Remove changelog file from recentlyEditedFiles list
       .filter(
         (recentlyEditedFile) =>
           recentlyEditedFile.path !== this.settings.changelogFilePath
+      )
+      // Remove files from paths to be excluded from recentlyEditedFiles list
+      .filter(
+        function (recentlyEditedFile) {
+          let i;
+          let keep = true;
+          for (i = 0; i < pathsToExclude.length; i++) {
+            if (recentlyEditedFile.path.includes(pathsToExclude[i])) {
+              keep = false;
+              break;
+            }
+          }
+          return keep;
+        }
       )
       .sort((a, b) => (a.stat.mtime < b.stat.mtime ? 1 : -1))
       .slice(0, this.settings.numberOfFilesToShow);
@@ -119,6 +135,7 @@ interface ChangelogSettings {
   changelogFilePath: string;
   numberOfFilesToShow: number;
   watchVaultChange: boolean;
+  excludePaths: string;
 }
 
 class ChangelogSettingsTab extends PluginSettingTab {
@@ -177,5 +194,18 @@ class ChangelogSettingsTab extends PluginSettingTab {
             this.plugin.registerWatchVaultEvents();
           })
       );
+    
+      new Setting(containerEl)
+      .setName("Excluded paths")
+      .setDesc("Paths or folders to ignore from changelog, separated by a comma")
+      .addText((text) => {
+        text
+          .setPlaceholder("Example: Meetings,People")
+          .setValue(settings.excludePaths)
+          .onChange((value) => {
+            settings.excludePaths = value;
+            this.plugin.saveSettings();
+          });
+      });
   }
 }
