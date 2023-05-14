@@ -88,7 +88,7 @@ export default class Changelog extends Plugin {
           let i;
           let keep = true;
           for (i = 0; i < pathsToExclude.length; i++) {
-            if (recentlyEditedFile.path.includes(pathsToExclude[i])) {
+            if (recentlyEditedFile.path.includes(pathsToExclude[i].trim())) {
               keep = false;
               break;
             }
