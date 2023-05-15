@@ -27,7 +27,7 @@ export default class Changelog extends Plugin {
   settings: ChangelogSettings;
 
   async onload() {
-    console.log("Loading Changelog plugin");
+    console.log("Loading Changelog plugin Qwxlea");
 
     await this.loadSettings();
 
@@ -99,11 +99,17 @@ export default class Changelog extends Plugin {
       .sort((a, b) => (a.stat.mtime < b.stat.mtime ? 1 : -1))
       .slice(0, this.settings.numberOfFilesToShow);
     let changelogContent = ``;
+    let header = ``;
     for (let recentlyEditedFile of recentlyEditedFiles) {
       // TODO: make date format configurable (and validate it)
       const humanTime = window
         .moment(recentlyEditedFile.stat.mtime)
         .format("YYYY-MM-DD [at] HH[h]mm");
+        console.log(humanTime, "@", header);
+        if (header != humanTime.substring(0,10)) {
+        header = humanTime.substring(0,10)
+        changelogContent += `## ${header}\n`
+      }
       changelogContent += `- ${humanTime} · [[${recentlyEditedFile.basename}]]\n`;
     }
     return changelogContent;
