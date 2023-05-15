@@ -105,7 +105,6 @@ export default class Changelog extends Plugin {
       const humanTime = window
         .moment(recentlyEditedFile.stat.mtime)
         .format("YYYY-MM-DD [at] HH[h]mm");
-        console.log(humanTime, "@", header);
         if (header != humanTime.substring(0,10)) {
         header = humanTime.substring(0,10)
         changelogContent += `## ${header}\n`
