@@ -104,12 +104,13 @@ export default class Changelog extends Plugin {
       // TODO: make date format configurable (and validate it)
       const humanTime = window
         .moment(recentlyEditedFile.stat.mtime)
-        .format("YYYY-MM-DD [at] HH[h]mm");
+        // date is already shown in the titles
+        .format("YYYY-MM-DD HH[h]mm");
         if (header != humanTime.substring(0,10)) {
         header = humanTime.substring(0,10)
         changelogContent += `## ${header}\n`
       }
-      changelogContent += `- ${humanTime} · [[${recentlyEditedFile.basename}]]\n`;
+      changelogContent += `- ${humanTime.substring(10,16)} · [[${recentlyEditedFile.basename}]]\n`;
     }
     return changelogContent;
   }
