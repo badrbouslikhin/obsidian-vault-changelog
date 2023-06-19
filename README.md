@@ -24,6 +24,7 @@ You can install the plugin via the Community Plugins tab within Obsidian. Just s
 ## How to use
 
 Once the plugin is installed and activated, you must provide it with the changelog file path.
+If none is provided, a default changelog file named `Changelog.md` will be created at the root of the vault by default.
 
 You can update the changelog using the new command `Vault changelog: update` in the command palette.
 
