@@ -98,7 +98,22 @@ export default class Changelog extends Plugin {
     if (file instanceof TFile) {
       await this.app.vault.modify(file, content);
     } else {
-      new Notice("Couldn't write changelog: check the file path");
+      // If no filePath is provided, we create a default one.
+      if (filePath === "") {
+        filePath = "Changelog.md";
+        new Notice("No changelog path provided, creating a default one: " + filePath);
+        this.settings.changelogFilePath = filePath;
+        this.saveSettings();
+      }
+      else {
+        new Notice("Couldn't find a changelog file at: " + filePath + ", creating one.");
+      }
+      const lastSlashIndex = filePath.lastIndexOf('/');
+      const folder = filePath.substring(0, lastSlashIndex);
+      if (folder != '') {
+        await this.app.vault.createFolder(folder);
+      }
+      await this.app.vault.create(filePath, content);
     }
   }
 
