@@ -21,16 +21,17 @@ The changelog update can be triggered both manually and automatically.
 
 You can install the plugin via the Community Plugins tab within Obsidian. Just search for "Changelog".
 
-## How to use
+## How to Use
 
-Once the plugin is installed and activated, you must provide it with the changelog file path.
+To use this plugin, first install and activate it. Once activated, you'll need to provide the plugin with the path to your changelog file.
 
-You can update the changelog using the new command `Vault changelog: update` in the command palette.
+To update the changelog, you can use the new `Vault changelog: update` command in the command palette.
 
-You can configure two other options:
+Additionally, there are three other configuration options available:
 
-1. Number of recent files to show in the changelog
-1. Automatic refresh of the changelog: this option automatically updates changelog on any note modification, deletion or rename.
+1. **Number of Recent Files:** You can configure the number of recent files to show in the changelog.
+1. **Automatic Refresh:** This option allows you to automatically update the changelog whenever a note is modified, deleted, or renamed.
+1. **Ignored Folders:** You can specify a list of folders to exclude from the changelog. Note that the paths are case-sensitive.
 
 ### Changelog file location
 

@@ -13,6 +13,7 @@ const DEFAULT_SETTINGS: ChangelogSettings = {
   numberOfFilesToShow: 10,
   changelogFilePath: "",
   watchVaultChange: false,
+  ignoreFolders: "",
 };
 
 declare global {
@@ -74,11 +75,16 @@ export default class Changelog extends Plugin {
 
   buildChangelog(): string {
     const files = this.app.vault.getMarkdownFiles();
+    const folderList = this.settings.ignoreFolders.split(",").map((folder) => folder.trim());
     const recentlyEditedFiles = files
       // Remove changelog file from recentlyEditedFiles list
       .filter(
         (recentlyEditedFile) =>
           recentlyEditedFile.path !== this.settings.changelogFilePath
+      )
+      // Remove files from ignored folders
+      .filter((recentlyEditedFile) =>
+        !folderList.includes(recentlyEditedFile.parent.path)
       )
       .sort((a, b) => (a.stat.mtime < b.stat.mtime ? 1 : -1))
       .slice(0, this.settings.numberOfFilesToShow);
@@ -119,6 +125,7 @@ interface ChangelogSettings {
   changelogFilePath: string;
   numberOfFilesToShow: number;
   watchVaultChange: boolean;
+  ignoreFolders: string,
 }
 
 class ChangelogSettingsTab extends PluginSettingTab {
@@ -177,5 +184,18 @@ class ChangelogSettingsTab extends PluginSettingTab {
             this.plugin.registerWatchVaultEvents();
           })
       );
+
+    new Setting(containerEl)
+      .setName("Ignore folders")
+      .setDesc("Comma-separated list of folders to ignore")
+      .addText((text) => {
+        text
+          .setPlaceholder("Example: Daily,Engineering/Project")
+          .setValue(settings.ignoreFolders)
+          .onChange((value) => {
+            settings.ignoreFolders = value;
+            this.plugin.saveSettings();
+          });
+      });
   }
 }
