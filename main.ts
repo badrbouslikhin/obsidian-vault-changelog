@@ -13,6 +13,7 @@ const DEFAULT_SETTINGS: ChangelogSettings = {
   numberOfFilesToShow: 10,
   changelogFilePath: "",
   watchVaultChange: false,
+  formatAsTable: false,
   timeFormatting: "YYYY-MM-DD [at] HH[h]mm",
 };
 
@@ -88,13 +89,19 @@ export default class Changelog extends Plugin {
       )
       .sort((a, b) => (a.stat.mtime < b.stat.mtime ? 1 : -1))
       .slice(0, this.settings.numberOfFilesToShow);
-    let changelogContent = ``;
+
+    let changelogContent = !this.settings.formatAsTable
+      ? ``
+      : `| Title | Date |\n| --- | --- |\n`;
     for (let recentlyEditedFile of recentlyEditedFiles) {
       const humanTime = window
         .moment(recentlyEditedFile.stat.mtime)
         .format(this.settings.timeFormatting);
-      changelogContent += `- ${humanTime} · [[${recentlyEditedFile.basename}]]\n`;
+      changelogContent += !this.settings.formatAsTable
+        ? `- ${humanTime} · [[${recentlyEditedFile.basename}]]\n`
+        : `| [[${recentlyEditedFile.basename}]] | ${humanTime} |\n`;
     }
+
     return changelogContent;
   }
 
@@ -124,6 +131,7 @@ interface ChangelogSettings {
   changelogFilePath: string;
   numberOfFilesToShow: number;
   watchVaultChange: boolean;
+  formatAsTable: boolean;
   timeFormatting: string;
 }
 
@@ -181,6 +189,20 @@ class ChangelogSettingsTab extends PluginSettingTab {
             this.plugin.settings.watchVaultChange = value;
             this.plugin.saveSettings();
             this.plugin.registerWatchVaultEvents();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("Format changelog as a table")
+      // .setDesc(
+      //   "Automatically update changelog on any vault change (modification, renaming or deletion of a note)"
+      // )
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.formatAsTable)
+          .onChange((value) => {
+            this.plugin.settings.formatAsTable = value;
+            this.plugin.saveSettings();
           })
       );
 
