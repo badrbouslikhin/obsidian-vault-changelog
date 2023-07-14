@@ -13,6 +13,8 @@ const DEFAULT_SETTINGS: ChangelogSettings = {
   numberOfFilesToShow: 10,
   changelogFilePath: "",
   watchVaultChange: false,
+  formatAsTable: false,
+  timeFormatting: "YYYY-MM-DD [at] HH[h]mm",
 };
 
 declare global {
@@ -21,6 +23,11 @@ declare global {
     moment: typeof moment;
   }
 }
+
+// This is what Excalidraw does to get multiple lines in setting descriptions
+// https://github.com/zsviczian/obsidian-excalidraw-plugin/blob/d82815c56a3c11058e3d04b13ae4447a37775272/src/utils/Utils.ts#L621
+const fragWithHTML = (html: string) =>
+  createFragment((frag) => (frag.createDiv().innerHTML = html));
 
 export default class Changelog extends Plugin {
   settings: ChangelogSettings;
@@ -82,14 +89,19 @@ export default class Changelog extends Plugin {
       )
       .sort((a, b) => (a.stat.mtime < b.stat.mtime ? 1 : -1))
       .slice(0, this.settings.numberOfFilesToShow);
-    let changelogContent = ``;
+
+    let changelogContent = !this.settings.formatAsTable
+      ? ``
+      : `| Title | Date |\n| --- | --- |\n`;
     for (let recentlyEditedFile of recentlyEditedFiles) {
-      // TODO: make date format configurable (and validate it)
       const humanTime = window
         .moment(recentlyEditedFile.stat.mtime)
-        .format("YYYY-MM-DD [at] HH[h]mm");
-      changelogContent += `- ${humanTime} · [[${recentlyEditedFile.basename}]]\n`;
+        .format(this.settings.timeFormatting);
+      changelogContent += !this.settings.formatAsTable
+        ? `- ${humanTime} · [[${recentlyEditedFile.basename}]]\n`
+        : `| [[${recentlyEditedFile.basename}]] | ${humanTime} |\n`;
     }
+
     return changelogContent;
   }
 
@@ -119,6 +131,8 @@ interface ChangelogSettings {
   changelogFilePath: string;
   numberOfFilesToShow: number;
   watchVaultChange: boolean;
+  formatAsTable: boolean;
+  timeFormatting: string;
 }
 
 class ChangelogSettingsTab extends PluginSettingTab {
@@ -177,5 +191,36 @@ class ChangelogSettingsTab extends PluginSettingTab {
             this.plugin.registerWatchVaultEvents();
           })
       );
+
+    new Setting(containerEl)
+      .setName("Format changelog as a table")
+      // .setDesc(
+      //   "Automatically update changelog on any vault change (modification, renaming or deletion of a note)"
+      // )
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.formatAsTable)
+          .onChange((value) => {
+            this.plugin.settings.formatAsTable = value;
+            this.plugin.saveSettings();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("Time format")
+      .setDesc(
+        fragWithHTML(
+          "Default is YYYY-MM-DD [at] HH[h]mm <br> For more syntax, refer to <a href='https://momentjs.com/docs/#/displaying/format/'>format reference</a>"
+        )
+      )
+      .addText((text) => {
+        text
+          .setPlaceholder("YYYY-MM-DD [at] HH[h]mm")
+          .setValue(String(settings.timeFormatting))
+          .onChange((value) => {
+            settings.timeFormatting = value;
+            this.plugin.saveSettings();
+          });
+      });
   }
 }
