@@ -6,7 +6,6 @@ import {
   Setting,
   debounce,
   TFile,
-  MetadataCache,
 } from "obsidian";
 import type moment from "moment";
 
