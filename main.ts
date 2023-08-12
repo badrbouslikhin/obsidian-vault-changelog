@@ -27,7 +27,7 @@ export default class Changelog extends Plugin {
   settings: ChangelogSettings;
 
   async onload() {
-    console.log("Loading Changelog plugin Qwxlea");
+    console.log("Loading Changelog plugin");
 
     await this.loadSettings();
 
