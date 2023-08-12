@@ -6,6 +6,7 @@ import {
   Setting,
   debounce,
   TFile,
+  MetadataCache,
 } from "obsidian";
 import type moment from "moment";
 
@@ -75,6 +76,7 @@ export default class Changelog extends Plugin {
 
   buildChangelog(): string {
     const pathsToExclude = this.settings.excludePaths.split(',');
+    const cache = this.app.metadataCache;
     const files = this.app.vault.getMarkdownFiles();
     const recentlyEditedFiles = files
       // Remove changelog file from recentlyEditedFiles list
@@ -95,6 +97,16 @@ export default class Changelog extends Plugin {
           }
           return keep;
         }
+      )
+      // exclude if specifically told not to
+      .filter(
+        function (recentlyEditedFile) {
+          const frontMatter = cache.getFileCache(recentlyEditedFile).frontmatter;
+          if (frontMatter && frontMatter.publish === false) {
+            return false;  
+          }
+          return true;
+         }        
       )
       .sort((a, b) => (a.stat.mtime < b.stat.mtime ? 1 : -1))
       .slice(0, this.settings.numberOfFilesToShow);
