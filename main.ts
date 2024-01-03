@@ -98,7 +98,7 @@ export default class Changelog extends Plugin {
     if (file instanceof TFile) {
       await this.app.vault.modify(file, content);
     } else {
-      new Notice("Couldn't write changelog: check the file path");
+      new Notice(`Couldn't write changelog: check the file path - ${filePath}`);
     }
   }
 
